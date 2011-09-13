@@ -1976,7 +1976,7 @@ ngx_http_proxy_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
     ngx_conf_merge_value(conf->upstream.ssl_session_reuse,
                               prev->upstream.ssl_session_reuse, 1);
     ngx_conf_merge_uint_value(conf->upstream.ssl_verify,
-                              prev->upstream.ssl_verify, 0); 
+                              prev->upstream.ssl_verify, 0);
     ngx_conf_merge_uint_value(conf->upstream.ssl_verify_depth,
                               prev->upstream.ssl_verify_depth, 1);
     ngx_conf_merge_str_value(conf->upstream.ssl_ca_certificate,
@@ -1985,8 +1985,8 @@ ngx_http_proxy_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
     if (conf->upstream.ssl_verify) {
       if (conf->upstream.ssl_ca_certificate.len == 0) {
           ngx_log_error(NGX_LOG_EMERG, cf->log, 0,
-                        "no \"proxy_ssl_certificate\" is defined for "
-                        "the \"ssl_verify\" directive in %s:%ui",
+                        "no \"proxy_ssl_ca_certificate\" is defined for "
+                        "the \"proxy_ssl_verify\" directive in %s:%ui",
                         conf->file, conf->line);
           return NGX_CONF_ERROR;
       }
