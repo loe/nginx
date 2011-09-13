@@ -161,7 +161,7 @@ ngx_ssl_create(ngx_ssl_t *ssl, ngx_uint_t protocols, void *data)
 
     SSL_CTX_load_verify_locations(ssl->ctx, ssl->ca_certificate.data, NULL);
     SSL_CTX_set_verify(ssl->ctx, ssl->verify, NULL);
-    SSL_CTX_set_verify_depth(ssl-ctx, ssl->verify_depth);
+    SSL_CTX_set_verify_depth(ssl->ctx, ssl->verify_depth);
 
     /* server side options */
 
