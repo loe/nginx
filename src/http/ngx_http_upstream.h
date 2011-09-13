@@ -173,6 +173,9 @@ typedef struct {
 #if (NGX_HTTP_SSL)
     ngx_ssl_t                       *ssl;
     ngx_flag_t                       ssl_session_reuse;
+    ngx_uint_t                       ssl_verify;
+    ngx_uint_t                       ssl_verify_depth;
+    ngx_str_t                        ssl_ca_certificate;
 #endif
 
 } ngx_http_upstream_conf_t;
