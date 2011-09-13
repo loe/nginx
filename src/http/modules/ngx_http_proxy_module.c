@@ -3050,6 +3050,9 @@ ngx_http_proxy_set_ssl(ngx_conf_t *cf, ngx_http_proxy_loc_conf_t *plcf)
     }
 
     plcf->upstream.ssl->log = cf->log;
+    plcf->upstream.ssl->ca_certificate = cf->ssl_ca_certificate;
+    plcf->upstream.ssl->verify = cf->ssl_verify;
+    plcf->upstream.ssl->verify_depth = cf->ssl_verify_depth;
 
     if (ngx_ssl_create(plcf->upstream.ssl,
                        NGX_SSL_SSLv2|NGX_SSL_SSLv3|NGX_SSL_TLSv1, NULL)

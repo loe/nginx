@@ -157,6 +157,12 @@ ngx_ssl_create(ngx_ssl_t *ssl, ngx_uint_t protocols, void *data)
     SSL_CTX_set_options(ssl->ctx, SSL_OP_NETSCAPE_CHALLENGE_BUG);
     SSL_CTX_set_options(ssl->ctx, SSL_OP_NETSCAPE_REUSE_CIPHER_CHANGE_BUG);
 
+    /* verification options */
+    
+    SSL_CTX_load_verify_locations(ssl->ctx, ssl->ca_certificate, NULL);
+    SSL_CTX_set_verify(ssl->ctx, ssl->verify, NULL);
+    SSL_CTX_set_verify_depth(ssl-ctx, ssl->verify_depth);
+
     /* server side options */
 
     SSL_CTX_set_options(ssl->ctx, SSL_OP_SSLREF2_REUSE_CERT_TYPE_BUG);
