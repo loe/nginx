@@ -1971,6 +1971,9 @@ ngx_http_proxy_create_loc_conf(ngx_conf_t *cf)
     conf->upstream.intercept_errors = NGX_CONF_UNSET;
 #if (NGX_HTTP_SSL)
     conf->upstream.ssl_session_reuse = NGX_CONF_UNSET;
+    conf->upstream.ssl_verify = NGX_CONF_UNSET_UINT;
+    conf->upstream.ssl_verify_depth = NGX_CONF_UNSET_UINT;
+    conf->upstream.ssl_ca_certificate = NGX_CONF_UNSET;
 #endif
 
     /* "proxy_cyclic_temp_file" is disabled */
