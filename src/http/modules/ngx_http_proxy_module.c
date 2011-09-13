@@ -445,21 +445,21 @@ static ngx_command_t  ngx_http_proxy_commands[] = {
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_num_slot,
       NGX_HTTP_LOC_CONF_OFFSET,
-      offsetof(ngx_http_proxy_loc_conf_t, upstream->ssl.verify),
+      offsetof(ngx_http_proxy_loc_conf_t, upstream.ssl_verify),
       NULL },
 
       { ngx_string("proxy_ssl_verify_depth"),
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_num_slot,
       NGX_HTTP_LOC_CONF_OFFSET,
-      offsetof(ngx_http_proxy_loc_conf_t, upstream->ssl.verify_depth),
+      offsetof(ngx_http_proxy_loc_conf_t, upstream.ssl_verify_depth),
       NULL },
 
       { ngx_string("proxy_ssl_ca_certificate"),
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_str_slot,
       NGX_HTTP_LOC_CONF_OFFSET,
-      offsetof(ngx_http_proxy_loc_conf_t, upstream->ssl.ca_certificate),
+      offsetof(ngx_http_proxy_loc_conf_t, upstream.ssl_ca_certificate),
       NULL },
 
 #endif
@@ -1717,6 +1717,9 @@ ngx_http_proxy_create_loc_conf(ngx_conf_t *cf)
     conf->upstream.intercept_errors = NGX_CONF_UNSET;
 #if (NGX_HTTP_SSL)
     conf->upstream.ssl_session_reuse = NGX_CONF_UNSET;
+    conf->upstream.ssl_verify = NGX_CONF_UNSET_UINT;
+    conf->upstream.ssl_verify_depth = NGX_CONF_UNSET_UINT;
+    conf->upstream.ssl_ca_certificate = NGX_CONF_UNSET;
 #endif
 
     /* "proxy_cyclic_temp_file" is disabled */
@@ -2763,7 +2766,7 @@ ngx_http_proxy_set_ssl(ngx_conf_t *cf, ngx_http_proxy_loc_conf_t *plcf)
     }
 
     plcf->upstream.ssl->log = cf->log;
-    plcf->upstream.ssl->ca_certificate = cf->ssl_ca_certificate;
+    plcf->upstream.ssl->ca_certificate = ngx_pstrdup(cf->pool, cf->ssl_ca_certificate);
     plcf->upstream.ssl->verify = cf->ssl_verify;
     plcf->upstream.ssl->verify_depth = cf->ssl_verify_depth;
 
