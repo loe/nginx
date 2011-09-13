@@ -27,6 +27,9 @@
 typedef struct {
     SSL_CTX                    *ctx;
     ngx_log_t                  *log;
+    ngx_uint_t                 verify;
+    ngx_uint_t                 verify_depth;
+    ngx_str_t                  ca_certificate;
 } ngx_ssl_t;
 
 
