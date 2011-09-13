@@ -1719,7 +1719,6 @@ ngx_http_proxy_create_loc_conf(ngx_conf_t *cf)
     conf->upstream.ssl_session_reuse = NGX_CONF_UNSET;
     conf->upstream.ssl_verify = NGX_CONF_UNSET_UINT;
     conf->upstream.ssl_verify_depth = NGX_CONF_UNSET_UINT;
-    conf->upstream.ssl_ca_certificate = NGX_CONF_UNSET;
 #endif
 
     /* "proxy_cyclic_temp_file" is disabled */
@@ -1984,11 +1983,11 @@ ngx_http_proxy_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 
     if (conf->upstream.ssl_verify) {
       if (conf->upstream.ssl_ca_certificate.len == 0) {
-          ngx_log_error(NGX_LOG_EMERG, cf->log, 0,
-                        "no \"proxy_ssl_ca_certificate\" is defined for "
-                        "the \"proxy_ssl_verify\" directive in %s:%ui",
-                        conf->file, conf->line);
-          return NGX_CONF_ERROR;
+        ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
+            "no \"proxy_ssl_ca_certificate\" is defined for "
+            "the \"proxy_ssl_verify\" directive");
+
+        return NGX_CONF_ERROR;
       }
     }
 #endif
@@ -2766,9 +2765,12 @@ ngx_http_proxy_set_ssl(ngx_conf_t *cf, ngx_http_proxy_loc_conf_t *plcf)
     }
 
     plcf->upstream.ssl->log = cf->log;
-    plcf->upstream.ssl->ca_certificate = ngx_pstrdup(cf->pool, cf->ssl_ca_certificate);
-    plcf->upstream.ssl->verify = cf->ssl_verify;
-    plcf->upstream.ssl->verify_depth = cf->ssl_verify_depth;
+
+    plcf->upstream.ssl->ca_certificate.len = plcf->upstream.ssl_ca_certificate.len;
+    plcf->upstream.ssl->ca_certificate.data = plcf->upstream.ssl_ca_certificate.data;
+
+    plcf->upstream.ssl->verify = plcf->upstream.ssl_verify;
+    plcf->upstream.ssl->verify_depth = plcf->upstream.ssl_verify_depth;
 
     if (ngx_ssl_create(plcf->upstream.ssl,
                        NGX_SSL_SSLv2|NGX_SSL_SSLv3|NGX_SSL_TLSv1, NULL)
