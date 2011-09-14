@@ -441,6 +441,26 @@ static ngx_command_t  ngx_http_proxy_commands[] = {
       offsetof(ngx_http_proxy_loc_conf_t, upstream.ssl_session_reuse),
       NULL },
 
+    { ngx_string("proxy_ssl_verify_peer"),
+      NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
+      ngx_conf_set_flag_slot,
+      NGX_HTTP_LOC_CONF_OFFSET,
+      offsetof(ngx_http_proxy_loc_conf_t, upstream.ssl_verify_peer),
+      NULL },
+
+    { ngx_string("proxy_ssl_verify_depth"),
+      NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
+      ngx_conf_set_num_slot,
+      NGX_HTTP_LOC_CONF_OFFSET,
+      offsetof(ngx_http_proxy_loc_conf_t, upstream.ssl_verify_depth),
+      NULL },
+
+    { ngx_string("proxy_ssl_ca_certificate"),
+      NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
+      ngx_conf_set_str_slot,
+      NGX_HTTP_LOC_CONF_OFFSET,
+      offsetof(ngx_http_proxy_loc_conf_t, upstream.ssl_ca_certificate),
+      NULL },
 #endif
 
       ngx_null_command
@@ -1697,6 +1717,8 @@ ngx_http_proxy_create_loc_conf(ngx_conf_t *cf)
     conf->upstream.intercept_errors = NGX_CONF_UNSET;
 #if (NGX_HTTP_SSL)
     conf->upstream.ssl_session_reuse = NGX_CONF_UNSET;
+    conf->upstream.ssl_verify_peer = NGX_CONF_UNSET;
+    conf->upstream.ssl_verify_depth = NGX_CONF_UNSET_UINT;
 #endif
 
     /* "proxy_cyclic_temp_file" is disabled */
@@ -1955,6 +1977,22 @@ ngx_http_proxy_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 #if (NGX_HTTP_SSL)
     ngx_conf_merge_value(conf->upstream.ssl_session_reuse,
                               prev->upstream.ssl_session_reuse, 1);
+    ngx_conf_merge_value(conf->upstream.ssl_verify_peer,
+                              prev->upstream.ssl_verify_peer, 0);
+    ngx_conf_merge_uint_value(conf->upstream.ssl_verify_depth,
+                              prev->upstream.ssl_verify_depth, 1);
+    ngx_conf_merge_str_value(conf->upstream.ssl_ca_certificate,
+                              prev->upstream.ssl_ca_certificate, "");
+
+    if (conf->upstream.ssl_verify_peer) {
+      if (conf->upstream.ssl_ca_certificate.len == 0) {
+        ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
+            "no \"proxy_ssl_ca_certificate\" is defined for "
+            "the \"proxy_ssl_verify_peer\" directive");
+
+        return NGX_CONF_ERROR;
+      }
+    }
 #endif
 
     ngx_conf_merge_value(conf->redirect, prev->redirect, 1);
