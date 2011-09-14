@@ -216,13 +216,10 @@ ngx_ssl_certificate(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *cert,
     return NGX_OK;
 }
 
-
 ngx_int_t
-ngx_ssl_client_certificate(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *cert,
+ngx_ssl_set_verify_options(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *cert,
     ngx_int_t depth)
 {
-    STACK_OF(X509_NAME)  *list;
-
     SSL_CTX_set_verify(ssl->ctx, SSL_VERIFY_PEER, ngx_http_ssl_verify_callback);
 
     SSL_CTX_set_verify_depth(ssl->ctx, depth);
@@ -241,6 +238,19 @@ ngx_ssl_client_certificate(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *cert,
         ngx_ssl_error(NGX_LOG_EMERG, ssl->log, 0,
                       "SSL_CTX_load_verify_locations(\"%s\") failed",
                       cert->data);
+        return NGX_ERROR;
+    }
+
+    return NGX_OK;
+}
+
+ngx_int_t
+ngx_ssl_client_certificate(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *cert,
+    ngx_int_t depth)
+{
+    STACK_OF(X509_NAME)  *list;
+
+    if (ngx_ssl_set_verify_options(cf, ssl, cert, depth) != NGX_OK) {
         return NGX_ERROR;
     }
 
