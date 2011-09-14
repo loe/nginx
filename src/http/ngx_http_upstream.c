@@ -1230,6 +1230,17 @@ ngx_http_upstream_ssl_init_connection(ngx_http_request_t *r,
         }
     }
 
+    if (u->conf->ssl_verify_peer) {
+        if (ngx_ssl_set_verify_options(u->conf, u->conf->ssl,
+              u->conf->ssl_ca_certificate, u->conf->ssl_verify_depth)
+            != NGX_OK)
+        {
+            ngx_http_upstream_finalize_request(r, u,
+                                               NGX_HTTP_INTERNAL_SERVER_ERROR);
+            return;
+        }
+    }
+
     r->connection->log->action = "SSL handshaking to upstream";
 
     rc = ngx_ssl_handshake(c);
