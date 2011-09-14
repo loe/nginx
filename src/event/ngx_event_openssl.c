@@ -217,7 +217,7 @@ ngx_ssl_certificate(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *cert,
 }
 
 ngx_int_t
-ngx_ssl_set_verify_options(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *cert,
+ngx_ssl_set_verify_options(ngx_ssl_t *ssl, ngx_str_t *cert,
     ngx_int_t depth)
 {
     SSL_CTX_set_verify(ssl->ctx, SSL_VERIFY_PEER, ngx_http_ssl_verify_callback);
@@ -226,10 +226,6 @@ ngx_ssl_set_verify_options(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *cert,
 
     if (cert->len == 0) {
         return NGX_OK;
-    }
-
-    if (ngx_conf_full_name(cf->cycle, cert, 1) != NGX_OK) {
-        return NGX_ERROR;
     }
 
     if (SSL_CTX_load_verify_locations(ssl->ctx, (char *) cert->data, NULL)
@@ -250,7 +246,11 @@ ngx_ssl_client_certificate(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *cert,
 {
     STACK_OF(X509_NAME)  *list;
 
-    if (ngx_ssl_set_verify_options(cf, ssl, cert, depth) != NGX_OK) {
+    if (ngx_ssl_set_verify_options(ssl, cert, depth) != NGX_OK) {
+        return NGX_ERROR;
+    }
+
+    if (ngx_conf_full_name(cf->cycle, cert, 1) != NGX_OK) {
         return NGX_ERROR;
     }
 
