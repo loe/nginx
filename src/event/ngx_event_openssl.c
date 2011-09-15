@@ -360,7 +360,7 @@ ngx_http_ssl_verify_callback(int ok, X509_STORE_CTX *x509_store)
     }
 #endif
 
-    return 1;
+    return ok;
 }
 
 
@@ -576,7 +576,7 @@ ngx_ssl_set_session(ngx_connection_t *c, ngx_ssl_session_t *session)
 ngx_int_t
 ngx_ssl_handshake(ngx_connection_t *c)
 {
-    int        n, sslerr;
+    int        n, sslerr, verify_err, verify_mode;
     ngx_err_t  err;
 
     ngx_ssl_clear_error(c->log);
@@ -586,6 +586,22 @@ ngx_ssl_handshake(ngx_connection_t *c)
     ngx_log_debug1(NGX_LOG_DEBUG_EVENT, c->log, 0, "SSL_do_handshake: %d", n);
 
     if (n == 1) {
+
+        if (SSL_get_peer_certificate(c->ssl->connection) != NULL)
+        {
+            ngx_log_debug0(NGX_LOG_DEBUG_EVENT, c->log, 0, "SSL_get_peer_certificate is present");
+        }
+
+        verify_mode = SSL_get_verify_mode(c->ssl->connection);
+        ngx_log_debug1(NGX_LOG_DEBUG_EVENT, c->log, 0, "SSL_get_verify_mode: %d", verify_mode);
+
+        verify_err = SSL_get_verify_result(c->ssl->connection);
+        ngx_log_debug1(NGX_LOG_DEBUG_EVENT, c->log, 0, "SSL_get_verify_result: %d", verify_err);
+        if (verify_err != X509_V_OK)
+        {
+            ngx_ssl_error(NGX_LOG_ALERT, c->log, 0, "SSL_get_verify_result() failed");
+            return NGX_ERROR;
+        }
 
         if (ngx_handle_read_event(c->read, 0) != NGX_OK) {
             return NGX_ERROR;

@@ -1210,6 +1210,15 @@ ngx_http_upstream_ssl_init_connection(ngx_http_request_t *r,
 {
     ngx_int_t   rc;
 
+    if (ngx_ssl_set_verify_options(u->conf->ssl,
+          &u->conf->ssl_ca_certificate, u->conf->ssl_verify_depth)
+        != NGX_OK)
+    {
+      ngx_http_upstream_finalize_request(r, u,
+          NGX_HTTP_INTERNAL_SERVER_ERROR);
+      return;
+    }
+
     if (ngx_ssl_create_connection(u->conf->ssl, c,
                                   NGX_SSL_BUFFER|NGX_SSL_CLIENT)
         != NGX_OK)
