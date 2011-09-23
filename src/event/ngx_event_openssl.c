@@ -216,6 +216,7 @@ ngx_ssl_certificate(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *cert,
     return NGX_OK;
 }
 
+
 ngx_int_t
 ngx_ssl_set_verify_options(ngx_ssl_t *ssl, ngx_str_t *cert,
     ngx_int_t depth)
@@ -239,6 +240,7 @@ ngx_ssl_set_verify_options(ngx_ssl_t *ssl, ngx_str_t *cert,
 
     return NGX_OK;
 }
+
 
 ngx_int_t
 ngx_ssl_client_certificate(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *cert,
