@@ -360,7 +360,7 @@ ngx_http_ssl_verify_callback(int ok, X509_STORE_CTX *x509_store)
     }
 #endif
 
-    return ok;
+    return 1;
 }
 
 
