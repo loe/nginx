@@ -1985,12 +1985,19 @@ ngx_http_proxy_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
                               prev->upstream.ssl_ca_certificate, "");
 
     if (conf->upstream.ssl_verify_peer) {
-      if (conf->upstream.ssl_ca_certificate.len == 0) {
-        ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-            "no \"proxy_ssl_ca_certificate\" is defined for "
-            "the \"proxy_ssl_verify_peer\" directive");
+        if (conf->upstream.ssl_ca_certificate.len == 0) {
+          ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
+              "no \"proxy_ssl_ca_certificate\" is defined for "
+              "the \"proxy_ssl_verify_peer\" directive");
 
-        return NGX_CONF_ERROR;
+          return NGX_CONF_ERROR;
+      }
+
+      if (ngx_ssl_set_verify_options(conf->upstream.ssl,
+            &conf->upstream.ssl_ca_certificate, conf->upstream.ssl_verify_depth)
+          != NGX_OK)
+      {
+          return NGX_CONF_ERROR;
       }
     }
 #endif
